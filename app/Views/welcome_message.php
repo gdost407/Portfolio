@@ -7,7 +7,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>ASG Info</title>
-  <link rel="shortcut icon" type="image/png" href="/favicon.ico">
+  <link rel="shortcut icon" type="image/png" href="<?= base_url('assets/ASG-Logo.png');?>">
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -408,8 +408,7 @@
           </div>
 
           <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
-            <form action="" method="post"
-              role="form" class="php-email-form">
+            <form action="" method="post" role="form" class="php-email-form" id="emailForm">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label for="name">Your Name</label>
@@ -428,12 +427,7 @@
                 <label for="name">Message</label>
                 <textarea class="form-control" name="message" rows="10" required=""></textarea>
               </div>
-              <div class="my-3">
-                <div class="loading">Loading</div>
-                <div class="error-message"></div>
-                <div class="sent-message">Your message has been sent. Thank you!</div>
-              </div>
-              <div class="text-center"><button type="submit">Send Message</button></div>
+              <div class="text-center"><button type="submit" id="submitbtn">Send Message</button></div>
             </form>
           </div>
 
@@ -460,6 +454,7 @@
 
   <script src="<?= base_url('assets/bootstrap.bundle.min.js.download');?>"></script>
   <script src="<?= base_url('assets/main.js.download');?>"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/push.js/1.0.8/push.min.js"></script>
 
   <script>
     $(document).ready(function() {
@@ -475,6 +470,50 @@
           age--;
       }
       $("#age").html(age);
+
+      Push.create(name, {
+        body: 'Welcome to Aniket S Golhar Portfolio',
+        icon: '<?= base_url('assets/ASG-Logo.png');?>',
+        timeout: 4000,
+        onClick: function () {
+          window.focus();
+          this.close();
+        }
+      });
+    });
+
+    $('#emailForm').on('submit', function(e){
+        e.preventDefault();
+        $('#submitbtn').html('Submitting <div class="spinner-border text-light" role="status" style="width: 15px; height: 15px;"></div>');
+        
+        $.ajax({
+            url: '<?= base_url('/SendEmail');?>',
+            method: 'post',
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data){
+                // alert(data);
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX request failed:', status, error);
+            }
+        });
+
+        setTimeout(function(){
+          $('#submitbtn').html('Send Message');
+          $('#emailForm')[0].reset();
+          Push.create(name, {
+            body: 'Thank you for connect',
+            icon: '<?= base_url('assets/ASG-Logo.png');?>',
+            timeout: 4000,
+            onClick: function () {
+              window.focus();
+              this.close();
+            }
+          });
+        }, 5000);
     });  
   </script>
 </body>
